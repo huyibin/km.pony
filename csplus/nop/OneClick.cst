@@ -1,0 +1,103 @@
+﻿<%-- 
+Name:
+Author: 
+Description: 一键生成domain中的文档，保存到指定目录中
+--%>
+<%@ CodeTemplate Language="C#" TargetLanguage="Text" OutputType="None" CompilerVersion="v3.5" Description="The following template will generate a sample ASP.Net page." %>
+
+<%@ XmlProperty Name="Entity" Schema="entity.xsd" Optional="False" Category="MetaData" Description="" %>
+
+<%-- Required Properties --%>
+<%@ Property Category="Output" Name="SQLDirectory" 
+    Type="System.String" Default="" Optional="False" 
+    Description="The folder to save the generated files." 
+    Editor="System.Windows.Forms.Design.FolderNameEditor, System.Design, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" %>
+
+    
+<%@ Property Category="Output" Name="OutputDirectory" 
+    Type="System.String" Default="" Optional="False" 
+    Description="The folder to save the generated files." 
+    Editor="System.Windows.Forms.Design.FolderNameEditor, System.Design, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" %>
+    
+<%--
+    
+<%@ Property Category="Output" Name="ServiceDirectory" 
+    Type="System.String" Default="" Optional="False" 
+    Description="The folder to save the generated files." 
+    Editor="System.Windows.Forms.Design.FolderNameEditor, System.Design, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" %>
+    
+<%@ Property Category="Output" Name="SQLDirectory" 
+    Type="System.String" Default="" Optional="False" 
+    Description="The folder to save the generated files." 
+    Editor="System.Windows.Forms.Design.FolderNameEditor, System.Design, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" %>
+    
+<%@ Property Category="Output" Name="DataMapDirectory" 
+    Type="System.String" Default="" Optional="False" 
+    Description="The folder to save the generated files." 
+    Editor="System.Windows.Forms.Design.FolderNameEditor, System.Design, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" %>
+--%>
+    
+<%@ Register Name="SqlTemplate" Template="sql.cst" %> 
+<%@ Register Name="EntityTemplate" Template="Entity.cst" %> 
+<%@ Register Name="MapTemplate" Template="mapping.cst" %> 
+<%@ Register Name="IServiceTemplate" Template="IService.cst" %>    
+<%@ Register Name="ServiceTemplate" Template="Service.cst" %>   
+
+
+<% Generate(); %>
+
+<script runat="template">
+
+    public void Generate()
+    {
+        // 可以通过定义具体的路径，直接将文件保存到解决方案的文件夹下。
+        
+        // Create the output directory if it doesn't already exist.
+        if (!System.IO.Directory.Exists(this.OutputDirectory))
+            System.IO.Directory.CreateDirectory(this.OutputDirectory);
+      
+		
+		// Setup the progress bar.
+		this.Progress.MaximumValue = 7;
+        
+        
+        // -- domain
+        SqlTemplate sql = this.Create<SqlTemplate>();
+        sql.Entity = Entity;
+		this.CopyPropertiesTo(sql);
+		sql.RenderToFile(System.IO.Path.Combine(SQLDirectory, string.Format("{0}.sql",Entity.Name)), true);
+		Response.WriteLine("Rendering: sql");
+		this.Progress.Step = 1;
+		
+		EntityTemplate entity = this.Create<EntityTemplate>();
+        entity.Entity = Entity;
+		this.CopyPropertiesTo(entity);
+		entity.RenderToFile(System.IO.Path.Combine(OutputDirectory, string.Format("{0}.cs",Entity.Name)), true);
+		Response.WriteLine("Rendering: entity");
+		this.Progress.Step = 2;		
+		
+        MapTemplate map = this.Create<MapTemplate>();
+        map.Entity = Entity;
+		this.CopyPropertiesTo(map);
+		map.RenderToFile(System.IO.Path.Combine(OutputDirectory, string.Format("{0}Map.cs",Entity.Name)), true);
+		Response.WriteLine("Rendering: Map.cs");
+		this.Progress.Step = 3;	
+		        
+        IServiceTemplate iservice = this.Create<IServiceTemplate>();
+        iservice.Entity = Entity;
+		this.CopyPropertiesTo(iservice);
+		iservice.RenderToFile(System.IO.Path.Combine(OutputDirectory, string.Format("I{0}Service.cs",Entity.Name)), true);
+		Response.WriteLine("Rendering: iservice");
+		this.Progress.Step = 4;
+        
+		ServiceTemplate service = this.Create<ServiceTemplate>();
+        service.Entity = Entity;
+		this.CopyPropertiesTo(service);
+		service.RenderToFile(System.IO.Path.Combine(OutputDirectory, string.Format("{0}Service.cs",Entity.Name)), true);
+		Response.WriteLine("Rendering: service");
+		this.Progress.Step = 5;		
+		
+        
+     }
+
+</script>

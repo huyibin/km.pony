@@ -1,0 +1,63 @@
+﻿<%-- 
+Name:sql script
+Author: hu@blogQ.com.cn
+Description: 
+--%>
+<%@ CodeTemplate Language="C#" TargetLanguage="Text" Description="Create packing list from XML PO." %>
+
+<%@ Assembly Name="System.Design" %>
+<%@ Assembly Name="System.Data" %>
+
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.Text" %>
+<%@ XmlProperty Name="Entity" Schema="entity.xsd" Optional="False" Category="Data" Description="Purchase Order to generate packing list for." %>
+
+CREATE TABLE [dbo].[<%=Entity.TalbeName%>](
+    <% for(int i=0;i<Entity.Attributes.Count;i++) { 
+        var attr = Entity.Attributes[i]; 
+        string nativeType = Entity.DataTypes[attr.TypeId-1].DbType;
+        int length = attr.Length;
+        int precision = attr.Precision;
+        int scale = attr.Scale;        
+        %> 
+    [<%=attr.Name %>] <%=GetTypeDeclaration(nativeType,length,precision,scale)%> <% if(!attr.IsNullable) {%>NOT NUll<%} else {%>NULL<%}%>,
+    <% } %>
+CONSTRAINT [PK_<%=Entity.Name %>] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+
+<script runat="template">    
+
+public string GetTypeDeclaration(string nativeType, int size, int precision, int scale)
+{
+    string type = nativeType.Trim().ToLower();
+    StringBuilder builder = new StringBuilder();
+    builder.Append("[");
+    builder.Append(type);
+    builder.Append("]");
+    switch (type)
+    {
+        case "binary":
+        case "char":
+        case "nchar":
+        case "nvarchar":
+        case "varbinary":
+        case "varchar":
+            // add size
+            if (!(size == 0x7fffffff || size == -1))
+                builder.AppendFormat("({0})", size.ToString());
+            break;
+        case "decimal":
+        case "numeric":
+            // add scale
+            builder.AppendFormat("({0},{1})", precision, scale);
+            break;
+    }
+    return builder.ToString();
+}
+</script>
+
+

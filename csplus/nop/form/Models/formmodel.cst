@@ -1,0 +1,91 @@
+﻿<%-- 
+Name:Generating controller
+Author: huyibin@outlook.com
+Description: 
+--%>
+
+<%@ CodeTemplate Language="C#" TargetLanguage="Text" Description="Create packing list from XML PO." %>
+    
+<%@ Assembly Name="System.Design" %>
+<%@ Assembly Name="System.Data" %>
+
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.Text" %>        
+ 
+<%@ XmlProperty Name="Entity" Schema="../../entity.xsd" Optional="False" Category="Data" Description="" %>
+
+    namespace Dragonfly.<%=Entity.PresentationNS%>.Models.<%=Entity.Name%>s    
+    {
+    using Dragonfly.Web.Framework.Mvc;
+    using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
+    using System.Web.Mvc;
+    using System;
+
+
+
+    public partial class <%=Entity.Name%>FormModel : BaseNopEntityModel
+    {
+        public <%=Entity.Name%>FormModel()
+        {
+            <%foreach(var attr in Entity.Attributes){
+                if(attr.TypeId == 9)
+                {
+                    %>
+                    this.Available<%=attr.Name%>s = new List<SelectListItem>();
+                    <%
+                }
+            } %>
+        }
+        
+        <% foreach(var attribute in Entity.Attributes) {           
+                if (!attribute.IsEdit) continue;
+        %>  
+            <% if (!attribute.IsNullable) {
+                if ( attribute.TypeId == 9){%>
+            [Required(ErrorMessage="请选择<%=attribute.Label%>")]
+            <%} else {%>
+            [Required(ErrorMessage="请输入<%=attribute.Label%>")]
+            <%}}%>            
+            <%=GetProperty(Entity.DataTypes[attribute.TypeId-1].CsType,attribute.Name,attribute.IsNullable) %> 
+            
+        <% } %>
+        
+        <%-- 处理Lov --%>
+        <%foreach(var attr in Entity.Attributes){
+                if(attr.TypeId == 9)
+                {
+                    %>
+                    public IList<SelectListItem> Available<%=attr.Name%>s {get;set;}
+                    <%
+                }
+            } %>
+    }
+}
+             
+<script runat="template">
+public string GetProperty(string nativeType,string name,bool isNull)
+ {
+     string type = nativeType.Trim().ToLower();
+      StringBuilder builder = new StringBuilder();
+     switch(type)
+     {
+         case "int":
+         case "decimal":
+         case "datetime":
+         case "bool":
+         case "guid":
+             if (isNull)
+                builder.AppendFormat("public {0}? {1}{{get;set;}}",nativeType,name);
+             else
+                builder.AppendFormat("public {0} {1}{{get;set;}}",nativeType,name);
+             break;
+         default:
+             builder.AppendFormat("public {0} {1}{{get;set;}}",nativeType,name);
+             break;
+     }
+     
+     return builder.ToString();
+            
+}
+</script>

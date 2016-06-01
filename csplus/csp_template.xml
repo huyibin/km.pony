@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<csp>
+  <item>
+    <Id>1</Id>
+    <Name>Id</Name>
+    <Label>ID</Label>
+    <DataType>Guid</DataType>
+    <Len></Len>
+    <Prc></Prc>
+    <Scl></Scl>
+    <Null></Null>
+    <DefaultValue></DefaultValue>
+    <PK>True</PK>
+    <FK>False</FK>
+    <Edt>False</Edt>
+    <Lst>True</Lst>
+    <Remark></Remark>
+  </item>
+  <item>
+    <Id>2</Id>
+    <Name>EmployerId</Name>
+    <Label>EmployerId</Label>
+    <DataType>Guid</DataType>
+    <Len></Len>
+    <Prc></Prc>
+    <Scl></Scl>
+    <Null></Null>
+    <DefaultValue></DefaultValue>
+    <PK>True</PK>
+    <FK>False</FK>
+    <Edt>True</Edt>
+    <Lst>True</Lst>
+    <Remark></Remark>
+  </item>
+
+</csp>

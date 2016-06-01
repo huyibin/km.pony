@@ -1,0 +1,46 @@
+﻿<%-- 
+Name: misc
+Author: 
+Description: 
+--%>
+<%@ Template Language="C#" TargetLanguage="Text" %>
+<%@ XmlProperty Name="Entity" Schema="../entity.xsd" Optional="False" Category="Data" Description="Purchase Order to generate packing list for." %>
+
+
+// <%=Entity.Name %>
+Mapper.CreateMap<<%=Entity.Name%>,<%=Entity.Name%>FormModel>()
+        <%foreach(var attr in Entity.Attributes)
+          {
+              if(attr.TypeId ==9)
+              {
+            %>
+            .ForMember(dest => dest.Available<%=attr.Name%>s,mo=>mo.Ignore())
+            <%
+              }
+          }
+       %>;
+       
+Mapper.CreateMap<<%=Entity.Name%>FormModel,<%=Entity.Name%>>()        
+            .ForMember(dest => dest.CreatedBy,mo=>mo.Ignore()) 
+            .ForMember(dest => dest.CreatedOn,mo=>mo.Ignore())  
+            .ForMember(dest => dest.ModifiedBy,mo=>mo.Ignore()) 
+            .ForMember(dest => dest.LastModified,mo=>mo.Ignore())
+            .ForMember(dest => dest.Deleted,mo=>mo.Ignore()); 
+       
+       
+   #region <%=Entity.Name%>
+        public static <%=Entity.Name%>FormModel ToModel(this <%=Entity.Name%> entity)
+        {
+            return Mapper.Map<<%=Entity.Name%>, <%=Entity.Name%>FormModel>(entity);
+        }
+
+        public static <%=Entity.Name%> ToEntity(this <%=Entity.Name%>FormModel model)
+        {
+            return Mapper.Map<<%=Entity.Name%>FormModel, <%=Entity.Name%>>(model);
+        }
+
+        public static <%=Entity.Name%> ToEntity(this <%=Entity.Name%>FormModel model, <%=Entity.Name%> destination)
+        {
+            return Mapper.Map(model, destination);
+        }
+   #endregion

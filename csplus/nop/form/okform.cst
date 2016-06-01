@@ -1,0 +1,118 @@
+﻿<%-- 
+Name:Generating controller
+Author: huyibin@outlook.com
+Description: 
+--%>
+
+<%@ CodeTemplate Language="C#" TargetLanguage="Text" Description="Create packing list from XML PO." %>
+    
+<%@ Assembly Name="System.Design" %>
+<%@ Assembly Name="System.Data" %>
+
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.Text" %>
+
+<%@ XmlProperty Name="Entity" Schema="../entity.xsd" Optional="False" Category="Data" Description="" %>
+
+<%@ Property Category="Output" Name="OutputDirectory" 
+    Type="System.String" Default="" Optional="False" 
+    Description="The folder to save the generated files." 
+    Editor="System.Windows.Forms.Design.FolderNameEditor, System.Design, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" %>
+
+<%@ Register Name="COUTemplate" Template="views/createorupdate.cst" %> 
+<%@ Register Name="CreateViewTemplate" Template="views/create.cst" %> 
+<%@ Register Name="EditViewTemplate" Template="views/edit.cst" %>  
+<%@ Register Name="ListViewTemplate" Template="views/list.cst" %> 
+
+<%@ Register Name="FormModelTemplate" Template="models/formmodel.cst" %> 
+<%@ Register Name="ItemModelTemplate" Template="models/itemmodel.cst" %> 
+<%@ Register Name="ListModelTemplate" Template="models/listmodel.cst" %> 
+
+<%@ Register Name="ControllerTemplate" Template="controller.cst" %> 
+<%@ Register Name="AutoMapTemplate" Template="automap.cst" %> 
+
+
+
+
+
+<% Generate(); %>
+
+<script runat="template">
+
+    public void Generate()
+    {
+    // Create the output directory if it doesn't already exist.
+        if (!System.IO.Directory.Exists(this.OutputDirectory))
+            System.IO.Directory.CreateDirectory(this.OutputDirectory);
+		
+		// Setup the progress bar.
+		this.Progress.MaximumValue = 9;
+        
+        
+        // -- domain
+        COUTemplate cou = this.Create<COUTemplate>();
+        cou.Entity = Entity;
+		this.CopyPropertiesTo(cou);
+		cou.RenderToFile(System.IO.Path.Combine(OutputDirectory, "_CreateOrUpdate.cshtml"), true);
+		Response.WriteLine("Rendering: cou");
+		this.Progress.Step = 1;
+		
+		CreateViewTemplate createView = this.Create<CreateViewTemplate>();
+        createView.Entity = Entity;
+		this.CopyPropertiesTo(createView);
+		createView.RenderToFile(System.IO.Path.Combine(OutputDirectory, "Create.cshtml"), true);
+		Response.WriteLine("Rendering: createView");
+		this.Progress.Step = 2;
+        
+        EditViewTemplate editView = this.Create<EditViewTemplate>();
+        editView.Entity = Entity;
+		this.CopyPropertiesTo(editView);
+		editView.RenderToFile(System.IO.Path.Combine(OutputDirectory, "Edit.cshtml"), true);
+		Response.WriteLine("Rendering: editView");
+		this.Progress.Step = 3;
+        
+        ListViewTemplate listView = this.Create<ListViewTemplate>();
+        listView.Entity = Entity;
+		this.CopyPropertiesTo(listView);
+		listView.RenderToFile(System.IO.Path.Combine(OutputDirectory, "List.cshtml"), true);
+		Response.WriteLine("Rendering: listView");
+		this.Progress.Step = 4;       
+       
+        
+        FormModelTemplate formModel = this.Create<FormModelTemplate>();
+        formModel.Entity = Entity;
+		this.CopyPropertiesTo(formModel);
+		formModel.RenderToFile(System.IO.Path.Combine(OutputDirectory, string.Format("{0}FormModel.cs",Entity.Name)), true);
+		Response.WriteLine("Rendering: formModel");
+		this.Progress.Step = 5;
+        
+        ItemModelTemplate itemModel = this.Create<ItemModelTemplate>();
+        itemModel.Entity = Entity;
+		this.CopyPropertiesTo(itemModel);
+		itemModel.RenderToFile(System.IO.Path.Combine(OutputDirectory, string.Format("{0}ItemModel.cs",Entity.Name)), true);
+		Response.WriteLine("Rendering: itemModel");
+		this.Progress.Step = 6;
+        
+        ListModelTemplate listModel = this.Create<ListModelTemplate>();
+        listModel.Entity = Entity;
+		this.CopyPropertiesTo(listModel);
+		listModel.RenderToFile(System.IO.Path.Combine(OutputDirectory, string.Format("{0}ListModel.cs",Entity.Name)), true);
+		Response.WriteLine("Rendering: listModel");
+		this.Progress.Step = 7;
+        
+        ControllerTemplate controller = this.Create<ControllerTemplate>();
+        controller.Entity = Entity;
+		this.CopyPropertiesTo(controller);
+		controller.RenderToFile(System.IO.Path.Combine(OutputDirectory, string.Format("{0}Controller.cs",Entity.Name)), true);
+		Response.WriteLine("Rendering: controller");
+		this.Progress.Step = 8;
+        
+        AutoMapTemplate automap = this.Create<AutoMapTemplate>();
+        automap.Entity = Entity;
+		this.CopyPropertiesTo(automap);
+		automap.RenderToFile(System.IO.Path.Combine(OutputDirectory, string.Format("{0}AutoMap.txt",Entity.Name)), true);
+		Response.WriteLine("Rendering: automap");
+		this.Progress.Step = 9;
+        }
+
+</script>

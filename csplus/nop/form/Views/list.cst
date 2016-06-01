@@ -1,0 +1,84 @@
+﻿<%-- 
+Name:list view
+Author: huyibin@outlook.com
+Description: 
+--%>
+
+<%@ CodeTemplate Language="C#" TargetLanguage="Text" Description="" %>
+    
+<%@ Assembly Name="System.Design" %>
+<%@ Assembly Name="System.Data" %>
+
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.Text" %>        
+ 
+<%@ XmlProperty Name="Entity" Schema="../../entity.xsd" Optional="False" Category="Data" Description="" %>
+
+
+@model Dragonfly.<%=Entity.PresentationNS%>.Models.<%=Entity.CollectionName%>.<%=Entity.Name%>ListModel
+@{
+    ViewBag.Title = "";
+}
+@using Dragonfly.Web.Extensions;
+@using Dragonfly.Web.Framework;
+
+<div class="">
+    <h2>标题...</h2>@Html.ActionLink("创建...", "Create")
+    @if (Model.<%=Entity.Name%>Items.Count == 0)    
+    {
+       <p>暂时无数据"&nbsp;@Html.ActionLink("创建...", "create")</p>
+    }
+    else
+    {
+        <table class="table table-hover table-striped">
+            <tr>
+            <%for(int i=0;i<Entity.Attributes.Count;i++)
+              {
+                  var attr = Entity.Attributes[i];
+                  if ( !attr.IsList ) continue;%>                  
+                  <th><%=attr.Label%></th>
+            <%}%>             
+            <th>操作</th>
+            </tr>
+            @foreach (var item in Model.<%=Entity.Name%>Items)
+            {
+                <tr>
+                     <%for(int i=0;i<Entity.Attributes.Count;i++)
+                     {
+                          var attr = Entity.Attributes[i];
+                          if ( !attr.IsList ) continue;
+                          
+                          if(attr.TypeId == 9){                          
+                          %>  
+                          <td>@item.<%=attr.Name%>Text</td>
+                          <% continue;} %>
+                          <td>@item.<%=attr.Name%></td>
+                    <%}%>   
+                <td>
+                    @Html.ActionLink("编辑", "edit", new { id = item.Id }) &nbsp; | &nbsp;<a href="#" class="delete" data-id="@item.Id" onclick="return confirm('确定删除？');">删除</a>
+                </td>                   
+            </tr>
+            }
+        </table>
+    }
+    
+    <div class="pager">
+        @Html.Pager(Model.PagingFilteringContext).QueryParam("pagenumber")
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $(".delete").click(function () {
+            var id = $(this).attr("data-id");           
+                $.post("/<%=Entity.Name%>/delete", { "id": id }, function (data) {           
+                if (data.success) {
+                    location.href = "list";
+                }
+                else {
+                    alert("删除失败！");
+                }
+            });
+        });
+    });
+</script>

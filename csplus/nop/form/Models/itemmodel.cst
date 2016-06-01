@@ -1,0 +1,68 @@
+﻿<%-- 
+Name:Generating controller
+Author: huyibin@outlook.com
+Description: 
+--%>
+
+<%@ CodeTemplate Language="C#" TargetLanguage="Text" Description="Create packing list from XML PO." %>
+    
+<%@ Assembly Name="System.Design" %>
+<%@ Assembly Name="System.Data" %>
+
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.Text" %>        
+ 
+<%@ XmlProperty Name="Entity" Schema="../../entity.xsd" Optional="False" Category="Data" Description="" %>
+
+namespace Dragonfly.<%=Entity.PresentationNS%>.Models.<%=Entity.Name%>s
+{
+    using Dragonfly.Web.Framework.Mvc;
+    using System;
+
+
+    public partial class <%=Entity.Name%>ItemModel : BaseNopEntityModel
+    {
+        
+        <% foreach(var attr in Entity.Attributes) {           
+            if (attr.IsPKey) continue;
+            
+            if(attr.TypeId==9) // lov
+            {%>             
+            public string <%=attr.Name%>Text {get;set;} 
+            
+          <% continue;
+            } %>            
+            
+            <%=GetProperty(Entity.DataTypes[attr.TypeId-1].CsType,attr.Name,attr.IsNullable) %>  
+            
+        <%  
+        } %>
+    }
+}
+             
+<script runat="template">
+public string GetProperty(string nativeType,string name,bool isNull)
+ {
+     string type = nativeType.Trim().ToLower();
+      StringBuilder builder = new StringBuilder();
+     switch(type)
+     {
+         case "int":
+         case "decimal":
+         case "datetime":
+         case "bool":
+         case "guid":
+             if (isNull)
+                builder.AppendFormat("public {0}? {1}{{get;set;}}",nativeType,name);
+             else
+                builder.AppendFormat("public {0} {1}{{get;set;}}",nativeType,name);
+             break;
+         default:
+             builder.AppendFormat("public {0} {1}{{get;set;}}",nativeType,name);
+             break;
+     }
+     
+     return builder.ToString();
+            
+}
+</script>

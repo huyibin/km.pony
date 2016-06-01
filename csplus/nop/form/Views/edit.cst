@@ -1,0 +1,34 @@
+﻿<%-- 
+Name: _createorupdate template
+Author: huyibin@outlook.com
+Description: 
+--%>
+<%@ CodeTemplate Language="C#" TargetLanguage="Text" Description="" %>
+<%@ XmlProperty Name="Entity" Schema="../../entity.xsd" Optional="False" Category="Data" Description="" %>
+<%@ Assembly Name="System.Design" %>
+<%@ Assembly Name="System.Data" %>
+
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.Text" %>
+
+
+@model Dragonfly.<%=Entity.PresentationNS%>.Models.<%=Entity.CollectionName%>.<%=Entity.Name%>FormModel
+
+@{
+    ViewBag.Title = "修改...";
+}
+
+<div class="">
+    @using (Html.BeginForm("edit", "<%=Entity.Name%>", FormMethod.Post, new { @class = "form-horizontal" }))
+    {
+            <h2>更新...</h2>
+
+        @Html.Hidden("Id", Model.Id)
+        @Html.Partial("_CreateOrUpdate", Model)
+
+        <div class="col-sm-offset-2 col-sm-5">
+            <button type="submit" class="btn btn-primary">&nbsp;&nbsp;保存&nbsp;&nbsp;</button>
+        </div>
+
+    }
+</div>

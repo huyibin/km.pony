@@ -1,0 +1,40 @@
+﻿<%-- 
+Name:Generating controller
+Author: huyibin@outlook.com
+Description: 
+--%>
+
+<%@ CodeTemplate Language="C#" TargetLanguage="Text" Description="Create packing list from XML PO." %>
+    
+<%@ Assembly Name="System.Design" %>
+<%@ Assembly Name="System.Data" %>
+
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.Text" %>        
+ 
+<%@ XmlProperty Name="Entity" Schema="../entity.xsd" Optional="False" Category="Data" Description="" %>
+
+#region <%=Entity.Name%>
+    public static <%=Entity.Name%>FormModel ToFormModel(this <%=Entity.Name%> entity)
+    {
+        return Mapper.Map<<%=Entity.Name%>, <%=Entity.Name%>Model>(entity);
+    }
+    public static <%=Entity.Name%> ToEntity(this <%=Entity.Name%>FormModel model)
+    {
+        return Mapper.Map<<%=Entity.Name%>FormModel, <%=Entity.Name%>>(model);
+    }
+    public static <%=Entity.Name%> ToEntity(this <%=Entity.Name%>FormModel model, <%=Entity.Name%> destination)
+    {
+        return Mapper.Map(model, destination);
+    }
+#endregion
+
+// <%=Entity.Name%>
+Mapper.CreateMap<<%=Entity.Name%>, <%=Entity.Name%>FormModel>();
+
+Mapper.CreateMap<<%=Entity.Name%>FormModel, <%=Entity.Name%>>()
+      .ForMember(dest => dest.CreatedBy, mo => mo.Ignore())
+      .ForMember(dest => dest.CreatedOn, mo => mo.Ignore())
+      .ForMember(dest => dest.LastModified, mo => mo.Ignore())
+      .ForMember(dest => dest.Deleted, mo => mo.Ignore());
+             

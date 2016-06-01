@@ -1,0 +1,123 @@
+﻿<%-- 
+Name: _createorupdate template
+Author: huyibin@outlook.com
+Description: 
+--%>
+<%@ CodeTemplate Language="C#" TargetLanguage="Text" Description="Create packing list from XML PO." %>
+<%@ XmlProperty Name="Entity" Schema="../../entity.xsd" Optional="False" Category="Data" Description="" %>
+<%@ Assembly Name="System.Design" %>
+<%@ Assembly Name="System.Data" %>
+
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.Text" %>
+
+@model Dragonfly.<%=Entity.PresentationNS%>.Models.<%=Entity.CollectionName%>.<%=Entity.Name%>FormModel
+
+<%foreach(var attr in Entity.Attributes)
+{
+    if ( !attr.IsEdit ) continue;
+    
+    switch(attr.TypeId){
+        case 2:
+        case 3:
+        case 6:
+        case 10:
+            %>     <%--TextBox --%>       
+        <div class="form-group"> 
+            <label for="<%=attr.Name%>" class="col-sm-2 control-label"><% if(!attr.IsNullable){%><span class="required">*</span><%}%><%=attr.Label%></label>
+            <div class="col-sm-5">
+                @Html.TextBoxFor(m => m.<%=attr.Name%>, new { @class = "form-control", placeholder = "<%=attr.Label%>",maxlength="<%=attr.Length%>"})
+            </div>
+            <div class="col-sm-3">
+                @Html.ValidationMessageFor(m => m.<%=attr.Name%>)
+            </div>
+        </div> 
+        <%break;
+            case 11:%> <%--TextArea --%>
+        <div class="form-group"> 
+            <label for="<%=attr.Name%>" class="col-sm-2 control-label"><% if(!attr.IsNullable){%><span class="required">*</span><%}%><%=attr.Label%></label>
+            <div class="col-sm-8">
+                 @Html.TextAreaFor(m => m.<%=attr.Name%>, new { @class = "form-control ckeditor", placeholder = "", cols = "80", rows = "10" })
+            </div>       
+            <div class="col-sm-2">
+                @Html.ValidationMessageFor(m => m.<%=attr.Name%>)
+            </div>
+        </div> 
+        <% break;
+            case 9:%> <%-- DropDownList --%>
+        <div class="form-group">
+            <label for="<%=attr.Name%>" class="col-sm-2 control-label"><% if(!attr.IsNullable){%><span class="required">*</span><%}%><%=attr.Label%></label>
+            <div class="col-sm-5">
+                @Html.DropDownListFor(m => m.<%=attr.Name%>, Model.Available<%=attr.Name%>s, new { @class = "form-control", placeholder = "" })
+            </div>
+            <div class="col-sm-3">
+                @Html.ValidationMessageFor(m => m.<%=attr.Name%>)
+            </div>
+        </div>
+        <% break;
+            case 4:%> <%--CheckBox--%>
+        <div class="form-group"> 
+            <label for="<%=attr.Name%>" class="col-sm-2 control-label"><% if(!attr.IsNullable){%><span class="required">*</span><%}%><%=attr.Label%></label>
+            <div class="col-sm-5">
+                    <div class="checkbox">
+                        <label>
+                            @Html.CheckBoxFor(m => m.<%=attr.Name%>)
+                        </label>
+                    </div>
+                </div>
+            <div class="col-sm-3">
+                @Html.ValidationMessageFor(m => m.<%=attr.Name%>)
+            </div>
+        </div> 
+        <% break;
+             case 12:%> <%--Radio Buttons--%>
+        <div class="form-group"> 
+            <label for="<%=attr.Name%>" class="col-sm-2 control-label"><% if(!attr.IsNullable){%><span class="required">*</span><%}%><%=attr.Label%></label>
+            <div class="col-sm-5">
+                <%foreach(string r in attr.Description.Split(';')){
+                
+                    var option = r.Split('=');
+                    %>
+                    
+                    <label class="radio-inline"><input name="<%=attr.Name%>" type="radio" value="<%=option[1]%>" checked=""><%=option[0]%></label>
+                <%
+                    }%>
+                </div>
+            <div class="col-sm-3">
+                @Html.ValidationMessageFor(m => m.<%=attr.Name%>)
+            </div>
+        </div> 
+        <% break;
+            case 7:%> <%--Image - FileUpload--%>
+         <div class="form-group">
+            <label for="<%=attr.Name%>" class="col-sm-2 control-label"><% if(!attr.IsNullable){%><span class="required">*</span><%}%><%=attr.Label%></label>
+            <div class="col-sm-5">
+                <img id="logoshow" src="@Model.LogoUrl" width="70" height="70" class="img-thumbnail" /><input type="file" id="imageFileUpload" name="imageFileUpload" />
+            </div>
+        </div>
+         <% break;           
+            case 8:%> <%--Doc - FileUpload--%>
+         <div class="form-group">
+            <label for="<%=attr.Name%>" class="col-sm-2 control-label"><% if(!attr.IsNullable){%><span class="required">*</span><%}%><%=attr.Label%></label>
+            <div class="col-sm-5">
+                <input type="file" id="docFileUpload" name="docFileUpload" />
+            </div>
+        </div>
+        <% break;
+            case 5:%> 
+            <div class="form-group"> <%--DatePicker--%>
+            <label for="<%=attr.Name%>" class="col-sm-2 control-label"><% if(!attr.IsNullable){%><span class="required">*</span><%}%><%=attr.Label%></label>
+            <div class="col-sm-5">
+                @Html.TextBoxFor(m => m.<%=attr.Name%>, new { @class = "form-control", placeholder = "<%=attr.Label%>",maxlength="10"})
+            </div>
+            <div class="col-sm-3">
+                @Html.ValidationMessageFor(m => m.<%=attr.Name%>)
+            </div>
+        </div> 
+            <%
+            break;
+    }   
+    
+    %>     
+    
+ <%}%> 

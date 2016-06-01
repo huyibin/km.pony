@@ -1,0 +1,112 @@
+﻿<%-- 
+Name:Entity
+Author: hu@blogQ.com.cn
+Description: 
+--%>
+<%@ CodeTemplate Language="C#" TargetLanguage="Text" Description="Create packing list from XML PO." %>
+<%@ XmlProperty Name="Entity" Schema="entity.xsd" Optional="False" Category="Data" Description="" %>
+
+<%@ Assembly Name="System.Design" %>
+<%@ Assembly Name="System.Data" %>
+
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.Text" %>
+
+namespace Dragonfly.Core.Domain.<%=Entity.Namespace%>
+{
+    using Dragonfly.Core;
+    using System;
+    
+    public partial class <%=Entity.Name %> : BaseEntity,ICloneable{
+        <% foreach(var attribute in Entity.Attributes) {           
+                if (attribute.IsPKey || attribute.TypeId == 13) continue;
+        %>           
+         /// <summary>
+        /// <%=attribute.Label%>
+        /// </summary>
+            <%=GetProperty(Entity.DataTypes[attribute.TypeId-1].CsType,attribute.Name,attribute.IsNullable) %>
+            <% if (attribute.TypeId == 12){%>
+            
+            /// <summary>
+            /// <%=attribute.Label%>
+           /// </summary>
+           <%=GetEnumProperty(attribute.Name) %>
+            <%} %>
+            
+        <% } %> 
+        
+       
+             public object Clone()
+            {
+              var <%=Entity.Name.ToLowerInvariant()%> = new <%=Entity.Name%>
+              {
+               <%foreach(var attr in Entity.Attributes){
+            if( attr.IsPKey || attr.TypeId == 13) continue;%>
+                <%=attr.Name%> = this.<%=attr.Name%>,
+            <%} %>
+            };
+            
+            return <%=Entity.Name.ToLowerInvariant()%>;
+        }
+    }
+    
+     <% foreach(var attribute in Entity.Attributes) {  
+         if(attribute.TypeId != 12) continue;
+         var enumname = attribute.Name.Substring(0,attribute.Name.Length-4);
+         string[] enumoptions = attribute.Description.Split(';');
+     %>
+      /// <summary>
+      /// <%=attribute.Label%>
+      /// </summary>
+      public enum <%=enumname%>
+      {
+        <%foreach(var option in enumoptions){%>            
+             <%=option%>,
+        <%}%>
+      }
+      
+      <%}%>
+      
+}
+
+
+<script runat="template">
+public string GetProperty(string nativeType,string name,bool isNull)
+ {
+     string type = nativeType.Trim().ToLower();
+      StringBuilder builder = new StringBuilder();
+     switch(type)
+     {
+         case "int":
+         case "decimal":
+         case "datetime":
+         case "bool":     
+         case "guid":
+             if (isNull)
+                builder.AppendFormat("public {0}? {1}{{get;set;}}",nativeType,name);
+             else
+                builder.AppendFormat("public {0} {1}{{get;set;}}",nativeType,name);
+             break;  
+         default:
+             builder.AppendFormat("public {0} {1}{{get;set;}}",nativeType,name);
+             break;
+     }
+     
+     return builder.ToString();
+            
+}
+ 
+public string GetEnumProperty(string name)
+ {
+     string enumname = name.Substring(0,name.Length-4);
+      StringBuilder builder = new StringBuilder();     
+      //builder.AppendFormat("public {0} {1}{get{return ({0})this.{0}Id;}  set{this.{0}Id = (int)value;}",name,enumname);         
+     builder.Append("public %enumname% %enumname%{\nget{return (%enumname%)this.%name%;} \n set{this.%name% = (int)value;\n}}");
+    
+ 
+     
+     return builder.ToString().Replace("%name%",name).Replace("%enumname%",enumname);
+            
+}
+</script>
+

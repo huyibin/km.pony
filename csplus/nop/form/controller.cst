@@ -1,0 +1,214 @@
+﻿<%-- 
+Name:Generating controller
+Author: huyibin@outlook.com
+Description: 
+--%>
+<%@ CodeTemplate Language="C#" TargetLanguage="Text" Description="Create packing list from XML PO." %>
+<%@ XmlProperty Name="Entity" Schema="../entity.xsd" Optional="False" Category="Data" Description="" %>
+<%@ Assembly Name="System.Design" %>
+<%@ Assembly Name="System.Data" %>
+
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.Text" %>
+
+//-----------------------------------------------------------------
+//-- <%=Entity.Name%>Controller
+//-- CreatedBy: CodeSmith
+//----------------------------------------------------------------
+
+namespace Dragonfly.<%=Entity.PresentationNS%>.Controllers
+
+{
+    using Dragonfly.Core;
+    using Dragonfly.Core.Domain.Directory;
+    using Dragonfly.Services.Directory;    
+    
+    using Dragonfly.Core.Domain.<%=Entity.Namespace%>;
+
+    
+    using Dragonfly.Services.<%=Entity.Namespace%>;
+   
+    using Dragonfly.<%=Entity.PresentationNS%>.Extension;
+    using Dragonfly.<%=Entity.PresentationNS%>.Models.<%=Entity.CollectionName%>;    
+  
+    using System;
+    using System.Linq;
+    using System.Web.Mvc;
+    
+    public class <%=Entity.Name%>Controller : AuthorizedController
+    {
+
+        private readonly I<%=Entity.Name%>Service _<%=Entity.VariableName%>Service;
+        private readonly IWorkContext _workContext;
+        private readonly ILovService _lovService;        
+
+        public <%=Entity.Name%>Controller(
+            I<%=Entity.Name%>Service <%=Entity.VariableName%>Service,
+            IWorkContext workContext,
+            ILovService lovService  
+           )
+        {
+            this._<%=Entity.VariableName%>Service = <%=Entity.VariableName%>Service;
+            this._lovService = lovService;
+            this._workContext = workContext;
+        }
+
+        //
+        // GET: /Admin/<%=Entity.Name%>/
+        public ActionResult Index()
+        {
+            return RedirectToAction("list");
+        }
+
+        public ActionResult List(<%=Entity.Name%>PagingFilteringModel command)
+        {
+            // 初始化分页组件
+            if (command.PageSize <= 0) command.PageSize = 15;
+            if (command.PageNumber <= 0) command.PageNumber = 1;
+
+            var model = new <%=Entity.Name%>ListModel();
+            var <%=Entity.VariableName%>s = this._<%=Entity.VariableName%>Service.Search<%=Entity.Name%>s(command.PageNumber - 1, command.PageSize);
+            model.PagingFilteringContext.LoadPagedList(<%=Entity.VariableName%>s);
+
+            model.<%=Entity.Name%>Items = <%=Entity.VariableName%>s
+                .Select(x =>
+                {
+                    var m = new <%=Entity.Name%>ItemModel();
+                    Prepare<%=Entity.Name%>ItemModel(m, x);
+                    return m;
+                }).ToList();
+
+            return View(model);
+        }
+
+        public ActionResult Create()
+        {
+            var model = new <%=Entity.Name%>FormModel();
+
+            Prepare<%=Entity.Name%>FormModel(model);
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult Create(<%=Entity.Name%>FormModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var <%=Entity.VariableName%> = model.ToEntity();
+
+                <%=Entity.VariableName%>.CreatedBy = this._workContext.CurrentUser.Id;
+                <%=Entity.VariableName%>.CreatedOn = DateTime.Now;
+                <%=Entity.VariableName%>.ModifiedBy = this._workContext.CurrentUser.Id;
+                <%=Entity.VariableName%>.LastModified = DateTime.Now;
+                <%=Entity.VariableName%>.Deleted = false;
+
+                _<%=Entity.VariableName%>Service.Create<%=Entity.Name%>(<%=Entity.VariableName%>);
+
+                return RedirectToAction("List");
+            }
+
+            Prepare<%=Entity.Name%>FormModel(model);
+            return View(model);
+        }
+
+       
+        public ActionResult Edit(Guid id)
+        {
+            var <%=Entity.VariableName%> = _<%=Entity.VariableName%>Service.Get<%=Entity.Name%>ById(id);
+            if (<%=Entity.VariableName%> == null || <%=Entity.VariableName%>.Deleted)
+                return RedirectToAction("List");
+
+            var model = <%=Entity.VariableName%>.ToModel();
+
+            Prepare<%=Entity.Name%>FormModel(model);
+            return View(model);
+        }
+
+         [HttpPost]
+        public ActionResult Edit(<%=Entity.Name%>FormModel model)
+        {
+            var <%=Entity.VariableName%> = _<%=Entity.VariableName%>Service.Get<%=Entity.Name%>ById(model.Id);
+            if (<%=Entity.VariableName%> == null || <%=Entity.VariableName%>.Deleted)
+                return RedirectToAction("List");
+
+            if (ModelState.IsValid)
+            {
+                <%=Entity.VariableName%> = model.ToEntity(<%=Entity.VariableName%>);
+                <%=Entity.VariableName%>.LastModified = DateTime.Now;
+
+                _<%=Entity.VariableName%>Service.Update<%=Entity.Name%>(<%=Entity.VariableName%>);
+                return RedirectToAction("List");
+            }
+
+            Prepare<%=Entity.Name%>FormModel(model);
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult Delete(Guid id)
+        {
+            var <%=Entity.VariableName%> = _<%=Entity.VariableName%>Service.Get<%=Entity.Name%>ById(id);
+
+            if (<%=Entity.VariableName%> == null || <%=Entity.VariableName%>.Deleted)
+                return RedirectToAction("list");
+
+            _<%=Entity.VariableName%>Service.Remove<%=Entity.Name%>(<%=Entity.VariableName%>);
+            return Json(new { success = true, message = "ok" });
+        }
+
+
+        [NonAction]
+        public virtual void Prepare<%=Entity.Name%>ItemModel(<%=Entity.Name%>ItemModel model, <%=Entity.Name%> entity)
+        {
+            if (entity == null)
+                throw new ArgumentNullException("entity");
+
+            if (model == null)
+                throw new ArgumentNullException("model");
+                        
+            model.Id = entity.Id;
+            <%foreach(var attr in Entity.Attributes) {
+                if(!attr.IsList) continue;
+                
+                if(attr.TypeId ==9)
+                {
+                    if(!attr.IsNullable){
+            %>
+                    model.<%=attr.Name%>Text = _lovService.GetLovTextByValue(LovType.<%=attr.Name%>,entity.<%=attr.Name%>);
+                    <%} else {%>
+                     model.<%=attr.Name%>Text = (entity.<%=attr.Name%> == null) ? "": _lovService.GetLovTextByValue(LovType.<%=attr.Name%>,(int)entity.<%=attr.Name%>);                    
+                    <%} %>                   
+              <% continue;} %>                  
+            model.<%=attr.Name%> = entity.<%=attr.Name%>;  
+            <%} %>
+        }
+
+        [NonAction]
+        public virtual void Prepare<%=Entity.Name%>FormModel(<%=Entity.Name%>FormModel model)
+        {
+            if (model == null)
+                throw new ArgumentNullException("model:<%=Entity.Name%> is null");
+            
+            <%foreach(var attr in Entity.Attributes){
+                if(attr.TypeId == 9 ) 
+                {// 处理lov
+            %>
+                
+            var <%=attr.Name.ToLower()%>s = _lovService.GetLovsByType(LovType.<%=attr.Name%>);
+            model.Available<%=attr.Name%>s.Add(new SelectListItem() { Text = "请选择", Value = "", Selected = true });
+            foreach(var item in <%=attr.Name.ToLower()%>s)
+            {
+                model.Available<%=attr.Name%>s.Add(new SelectListItem()
+                {
+                    Text = item.Text,
+                    Value = item.Value.ToString()
+                });
+            }
+            
+             <%}
+           } %>                      
+        }
+
+
+    }
+}

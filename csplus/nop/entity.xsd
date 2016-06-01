@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema targetNamespace="http://tempuri.org/XMLSchema.xsd"
+    elementFormDefault="qualified"
+    xmlns="http://tempuri.org/XMLSchema.xsd"
+    xmlns:mstns="http://tempuri.org/XMLSchema.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+  <xs:element name="Entity">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Id" type="xs:int"></xs:element>
+        <xs:element name="Name" type="xs:string"></xs:element>
+        <xs:element name="VariableName" type="xs:string"></xs:element>
+        <xs:element name="TalbeName" type="xs:string"></xs:element>
+        <xs:element name="CollectionName" type="xs:string"></xs:element>
+        <xs:element name="Namespace" type="xs:string"></xs:element>
+        <xs:element name="PresentationNS" type="xs:string"></xs:element>
+        <xs:element name="MasterId" type="xs:int"></xs:element>
+        <xs:element name="Revision" type="xs:string"></xs:element>
+        <xs:element name="ProjectId" type="xs:int"></xs:element>
+        <xs:element name="Description" type="xs:string"></xs:element>
+        <xs:element name="Attributes">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Attribute" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="Id" type="xs:int" use="required"></xs:attribute>
+                  <xs:attribute name="Name" type="xs:string" use="required"></xs:attribute>
+                  <xs:attribute name="Label" type="xs:string" use="optional"></xs:attribute>
+                  <xs:attribute name="TypeId" type="xs:int" use="required"></xs:attribute>
+                  <xs:attribute name="Length" type="xs:int" use="optional"></xs:attribute>
+                  <xs:attribute name="Precision" type="xs:int" use="optional"></xs:attribute>
+                  <xs:attribute name="Scale" type="xs:int" use="optional"></xs:attribute>
+                  <xs:attribute name="IsNullable" type="xs:boolean" use="optional"></xs:attribute>
+                  <xs:attribute name="DefaultValue" type="xs:string" use="optional"></xs:attribute>
+                  <xs:attribute name="IsIdentity" type="xs:boolean" use="optional"></xs:attribute>
+                  <xs:attribute name="IsPKey" type="xs:boolean" use="optional"></xs:attribute>
+                  <xs:attribute name="IsFKey" type="xs:boolean" use="optional"></xs:attribute>
+                  <xs:attribute name="IsEdit" type="xs:boolean" use="optional"></xs:attribute>
+                  <xs:attribute name="IsList" type="xs:boolean" use="optional"></xs:attribute>
+                  <xs:attribute name="Revision" type="xs:int" use="optional"></xs:attribute>
+                  <xs:attribute name="Description" type="xs:string" use="optional"></xs:attribute>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="DataTypes">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="DateType"  maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="Id"  type="xs:int"></xs:attribute>
+                  <xs:attribute name="DbType" type="xs:string"></xs:attribute>
+                  <xs:attribute name="CsType" type="xs:string"></xs:attribute>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

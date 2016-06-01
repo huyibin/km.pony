@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="csp">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" name="item">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Id" type="xs:unsignedByte" />
+              <xs:element name="Name" type="xs:string" />
+              <xs:element name="Label" type="xs:string" />
+              <xs:element name="DataType" type="xs:string" />
+              <xs:element name="Len" />
+              <xs:element name="Prc" />
+              <xs:element name="Scl" />
+              <xs:element name="Null" />
+              <xs:element name="DefaultValue" />
+              <xs:element name="PK" type="xs:string" />
+              <xs:element name="FK" type="xs:string" />
+              <xs:element name="Edt" type="xs:string" />
+              <xs:element name="Lst" type="xs:string" />
+              <xs:element name="Remark" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
